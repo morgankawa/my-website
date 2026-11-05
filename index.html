@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тест · Наблюдай</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@800;900&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#d3130e;--cream:#efe6d2;--ink:#121212;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--red);color:var(--cream);font-family:Oswald,"Arial Narrow",Arial,sans-serif;
+background-image:radial-gradient(var(--ink) 1.2px,transparent 1.6px),radial-gradient(rgba(0,0,0,.18) 1px,transparent 1.5px);
+background-size:7px 7px,3px 3px;background-position:0 0,1px 1px;
+-webkit-mask:none}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(var(--red) 18%,rgba(211,19,14,.0) 60%,var(--red) 95%);z-index:0}
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:22px 18px 40px;min-height:100vh;display:flex;flex-direction:column}
+h1,h2{font-family:Rubik,Impact,Arial Black,sans-serif;font-weight:900;color:var(--cream);margin:0;line-height:.95;letter-spacing:-.02em;text-transform:uppercase;text-shadow:2px 2px 0 rgba(0,0,0,.35)}
+h1{font-size:clamp(46px,16vw,84px);margin-top:8vh}
+.sub{font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-size:13px;margin:14px 0 28px}
+.tag{display:inline-block;background:var(--red);color:var(--cream);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border:1.5px solid var(--cream)}
+.btn{font-family:Oswald,sans-serif;font-weight:600;font-size:18px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--cream);border:2px solid var(--ink);padding:14px 22px;cursor:pointer;border-radius:3px}
+.btn:active{transform:translateY(1px)}
+.btn.alt{background:transparent;color:var(--cream);border-color:var(--cream)}
+.btn[disabled]{opacity:.45;cursor:default}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:22px;font-weight:600;letter-spacing:.1em;font-size:14px}
+.track{flex:1;height:7px;background:rgba(0,0,0,.45)}
+.track i{display:block;height:100%;background:var(--cream);transition:width .3s}
+.card{background:var(--cream);color:var(--ink);padding:20px 18px;margin:16px 0 18px;border-radius:3px;box-shadow:6px 6px 0 var(--ink)}
+.card .num{font-family:Rubik,sans-serif;font-weight:900;font-size:15px;color:var(--red)}
+.card p{margin:6px 0 0;font-size:clamp(20px,5.4vw,25px);line-height:1.25;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font-family:Oswald,sans-serif;font-size:18px;line-height:1.25;background:var(--ink);color:var(--cream);border:2px solid var(--ink);padding:12px 14px;cursor:pointer;border-radius:3px}
+.opt b{font-family:Rubik,sans-serif;font-weight:900;color:var(--red);background:var(--cream);min-width:28px;height:28px;display:grid;place-items:center;font-size:15px;flex:none}
+.opt.on{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+.opt.on b{background:var(--ink);color:var(--cream)}
+textarea,input[type=text]{width:100%;font:inherit;font-size:18px;background:var(--cream);color:var(--ink);border:2px solid var(--ink);padding:12px;border-radius:3px;margin-top:10px;resize:vertical}
+textarea{min-height:170px}
+.row{display:flex;gap:10px;margin-top:18px}
+.row .btn{flex:1}
+.grow{flex:1}
+/* results */
+.poster{background:var(--red);border:3px solid var(--cream);padding:20px 16px;margin-top:10px;position:relative}
+.poster h2{font-size:clamp(38px,13vw,60px)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}
+.chip{background:var(--cream);color:var(--ink);text-align:center;padding:8px 2px;font-family:Rubik,sans-serif;font-weight:900;font-size:20px;border-radius:2px;box-shadow:3px 3px 0 var(--ink)}
+.chip small{font-size:20px;color:var(--red)}
+.open{background:var(--ink);color:var(--cream);padding:10px 12px;margin-top:10px;border-left:6px solid var(--cream);font-size:15px;line-height:1.35;white-space:pre-wrap;word-break:break-word}
+.open b{color:var(--red);background:var(--cream);padding:0 6px;margin-right:6px;font-family:Rubik,sans-serif}
+.foot{margin-top:16px;text-align:right}
+.hint{font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin-top:14px;opacity:.9}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+var L=["А","Б","В","Г","Д","Е"];
+var S=["I. Эмоциональный интеллект","II. Отношение к окружающим","III. Личностные особенности","IV. Социальное поведение","V. Саморефлексия и мировоззрение","Углублённая оценка личности"];
+var Q=[
+[0,"Как вы обычно реагируете, когда человек не оправдывает ваших ожиданий?",["Разочаровываюсь, но стараюсь понять причины его поведения.","Сразу теряю интерес к этому человеку.","Начинаю предъявлять претензии.","Принимаю, что люди не обязаны соответствовать моим ожиданиям."]],
+[0,"Вы заметили, что человеку неприятна ваша шутка. Как поступите?",["Объясню, что это была просто шутка.","Извинюсь и постараюсь больше не затрагивать эту тему.","Скажу, что он слишком чувствительный.","Проигнорирую его реакцию."]],
+[0,"Насколько легко вам признавать собственную неправоту?",["Очень легко, если понимаю свою ошибку.","Сложно, но я стараюсь это делать.","Практически никогда не признаю свою неправоту.","Зависит от человека и ситуации."]],
+[1,"Как вы относитесь к людям, которые интеллектуально или мировоззренчески отличаются от вас?",["С интересом, поскольку у каждого свой взгляд на мир.","Нейтрально, пока наши различия не мешают общению.","Считаю, что некоторые взгляды просто недопустимы для общения.","Стараюсь доказать, что моя позиция правильнее."]],
+[1,"Допустимо ли высмеивать человека ради шутки?",["Да, юмор не должен иметь ограничений.","Да, если человек сам воспринимает это нормально.","Нет, если шутка унижает человека.","Зависит от отношений между людьми."]],
+[1,"Вы замечаете, что участника намеренно исключают из общего общения. Ваши действия?",["Постараюсь включить его в разговор.","Не вмешиваюсь, это личное дело остальных.","Присоединюсь к большинству.","Сначала постараюсь разобраться в ситуации."]],
+[2,"Какие качества в людях раздражают вас больше всего?",["Высокомерие и неуважение.","Неискренность и лицемерие.","Навязчивость и отсутствие личных границ.","Глупость и неспособность мыслить критически."],"o"],
+[2,"Назовите три своих недостатка, которые могут мешать вам в общении.",null],
+[2,"Что для вас важнее: быть правым или сохранить хорошие отношения с человеком?",["Всегда быть правым.","Сохранить отношения, даже если придётся уступить.","Найти компромисс, если это возможно.","Зависит от значимости ситуации."]],
+[3,"Как вы относитесь к чёрному юмору, провокациям и спорным темам?",["Положительно, считаю, что обсуждать можно практически всё.","Нейтрально, пока это не направлено на унижение конкретного человека.","Отрицательно, предпочитаю избегать подобных тем.","Использую подобный юмор независимо от реакции окружающих."]],
+[3,"Если человек придерживается противоположного вашему мнения, будете ли вы продолжать с ним общение?",["Да, различия во взглядах не мешают общению.","Да, если человек уважает мою позицию.","Нет, мне комфортнее общаться с единомышленниками.","Попытаюсь переубедить его."]],
+[3,"Участник просит вас прекратить определённую тему разговора, поскольку она ему неприятна. Что сделаете?",["Прекращу обсуждение или сменю тему.","Спрошу, почему именно ему неприятна эта тема.","Продолжу, поскольку каждый имеет право на мнение.","Постараюсь найти компромисс."]],
+[4,"Как вы думаете, что делает человека неприятным собеседником?",["Неумение слушать других.","Постоянное желание доказать собственную правоту.","Неуважение к чужому мнению и личным границам.","Отсутствие интереса к собеседнику."],"o"],
+[4,"Есть ли разница между свободой выражения мнения и неуважением к окружающим?",["Нет, каждый имеет право говорить всё, что думает.","Да, свобода выражения мнения не освобождает от ответственности за свои слова.","Да, но окружающие не должны ограничивать чужое мнение.","Зависит от ситуации."]],
+[4,"Каким участником сообщества вы считаете себя?",["Общительным, открытым и дружелюбным.","Спокойным, предпочитающим наблюдать за общением.","Прямолинейным, иногда резким в высказываниях.","Инициативным, любящим дискуссии и обсуждения.","Замкнутым, которому требуется время, чтобы привыкнуть к людям."],"o"],
+[5,"Представьте, что человек, которого вы считали близким другом, публично высказал о вас неприятное мнение. Как вы отреагируете? Что будет для вас наиболее важным в этой ситуации?",null],
+[5,"Бывали ли случаи, когда вы намеренно причиняли человеку эмоциональный дискомфорт? Если да, то почему вы так поступили и как оцениваете свой поступок сейчас?",null],
+[5,"Как вы относитесь к людям, которые нуждаются в большем внимании, поддержке или общении, чем вы готовы им предоставить? Где, по-вашему, проходит граница между заботой о человеке и обязанностью перед ним?",null],
+[5,"Если вы узнаете, что большинство участников сообщества негативно относится к человеку, с которым вы хорошо общаетесь, повлияет ли это на ваше отношение к нему? Объясните почему.",null],
+[5,"Какое своё поведение в прошлом вы считаете ошибочным? Изменилось ли ваше отношение к нему со временем и чему эта ситуация вас научила?",null]
+];
+var app=document.getElementById("app"),i=0,A=[];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function intro(){
+ i=0;A=[];
+ app.innerHTML='<h1>Откройте<br>глаза</h1><div class="sub">Тест из 20 вопросов · по одному на экран</div><div><span class="tag">Отвечайте честно</span></div><div class="grow"></div><button class="btn" id="go" style="background:var(--cream);color:var(--ink);border-color:var(--cream)">Начать →</button>';
+ document.getElementById("go").onclick=show;
+}
+function show(){
+ if(i>=Q.length)return result();
+ var q=Q[i],o=q[2],extra=q[3]==="o",a=A[i];
+ var h='<div class="bar"><span>'+(i+1)+'/'+Q.length+'</span><div class="track"><i style="width:'+(i/Q.length*100)+'%"></i></div></div>';
+ h+='<span class="tag">'+esc(S[q[0]])+'</span>';
+ h+='<div class="card"><span class="num">№ '+(i+1)+'</span><p>'+esc(q[1])+'</p></div>';
+ if(!o){
+  h+='<textarea id="t" placeholder="Ваш ответ…">'+esc(a?a.t:"")+'</textarea>';
+ }else{
+  h+='<div class="opts">';
+  var n=o.length+(extra?1:0);
+  for(var k=0;k<n;k++){
+   var txt=k<o.length?o[k]:"Другое (свой ответ)";
+   h+='<button class="opt'+(a&&a.k===k?' on':'')+'" data-k="'+k+'"><b>'+L[k]+'</b><span>'+esc(txt)+'</span></button>';
+  }
+  h+='</div>';
+  if(extra)h+='<input type="text" id="t" placeholder="Ваш вариант…" style="display:'+(a&&a.k===o.length?'block':'none')+'" value="'+esc(a&&a.k===o.length?a.t:"")+'">';
+ }
+ h+='<div class="grow"></div><div class="row">'+(i>0?'<button class="btn alt" id="bk">← Назад</button>':'')+((!o||extra)?'<button class="btn" id="nx" style="background:var(--cream);color:var(--ink);border-color:var(--cream)">'+(i===Q.length-1?'Готово':'Далее →')+'</button>':'')+'</div>';
+ app.innerHTML=h;
+ var bk=document.getElementById("bk");if(bk)bk.onclick=function(){save(true);i--;show()};
+ var t=document.getElementById("t"),nx=document.getElementById("nx");
+ if(o){
+  var bs=app.querySelectorAll(".opt");
+  for(var b=0;b<bs.length;b++)bs[b].onclick=function(){
+   var k=+this.getAttribute("data-k");
+   if(extra&&k===o.length){A[i]={k:k,t:t.value};for(var x=0;x<bs.length;x++)bs[x].classList.remove("on");this.classList.add("on");t.style.display="block";t.focus();return}
+   A[i]={k:k};i++;setTimeout(show,160);
+  };
+ }
+ if(nx)nx.onclick=function(){
+  if(!o){if(!t.value.trim()){t.focus();return}A[i]={t:t.value.trim()}}
+  else{var c=A[i];if(!c||c.k!==o.length||!t.value.trim()){t.style.display="block";t.focus();return}A[i]={k:o.length,t:t.value.trim()}}
+  i++;show();
+ };
+ window.scrollTo(0,0);
+}
+function save(){var t=document.getElementById("t");if(!t)return;var q=Q[i],o=q[2];if(!o&&t.value.trim())A[i]={t:t.value.trim()};else if(o&&A[i]&&A[i].k===o.length)A[i].t=t.value.trim()}
+function result(){
+ var g="",op="";
+ for(var k=0;k<Q.length;k++){
+  var q=Q[k],a=A[k]||{},o=q[2];
+  if(!o){g+='<div class="chip">'+(k+1)+'<small>✎</small></div>';op+='<div class="open"><b>'+(k+1)+'</b>'+esc(a.t||"")+'</div>'}
+  else if(a.k===o.length){g+='<div class="chip">'+(k+1)+'-<small>'+L[a.k]+'</small></div>';op+='<div class="open"><b>'+(k+1)+'-'+L[a.k]+'</b>'+esc(a.t||"")+'</div>'}
+  else g+='<div class="chip">'+(k+1)+'-<small>'+L[a.k]+'</small></div>';
+ }
+ app.innerHTML='<div class="poster"><span class="tag">Тест пройден</span><h2 style="margin-top:12px">Мои ответы</h2><div class="grid">'+g+'</div><div class="sub" style="margin:0;font-size:12px">✎ — развёрнутый ответ, см. ниже</div></div>'
+ +'<div class="poster" style="margin-top:16px"><span class="tag">Развёрнутые ответы</span>'+op+'</div>'
+ +'<div class="hint">Сделайте скриншот экрана с ответами</div><div class="foot"><button class="btn alt" id="rs">Пройти заново</button></div>';
+ document.getElementById("rs").onclick=intro;
+ window.scrollTo(0,0);
+}
+intro();
+</script>
+</body>
+</html>
